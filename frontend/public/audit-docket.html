@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>FaceTrace — Visual Discovery & Verification Audit Docket</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=inter:wght@100..900&display=swap" rel="stylesheet"/>
+  <style>
+    @layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}
+    ::-webkit-scrollbar{display:none;}
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config={
+      darkMode:"class",
+      theme:{
+        extend:{
+          colors:{
+            "surface-dim":"#ccdbf3",
+            "on-tertiary-fixed":"#331200",
+            "primary-fixed":"#dae2fd",
+            "on-tertiary-container":"#cf6721",
+            "inverse-primary":"#bec6e0",
+            "surface-container-lowest":"#ffffff",
+            "surface-bright":"#f8f9ff",
+            "background":"#f8f9ff",
+            "on-primary-container":"#7c839b",
+            "inverse-surface":"#233144",
+            "primary-container":"#131b2e",
+            "surface-container-low":"#eff4ff",
+            "on-secondary-container":"#007233",
+            "tertiary-container":"#331200",
+            "on-error":"#ffffff",
+            "outline":"#76777d",
+            "surface-tint":"#565e74",
+            "error-container":"#ffdad6",
+            "surface-container-high":"#dce9ff",
+            "on-surface":"#0d1c2e",
+            "on-secondary-fixed":"#00210a",
+            "tertiary":"#000000",
+            "primary-fixed-dim":"#bec6e0",
+            "secondary":"#006d30",
+            "secondary-container":"#92f5a4",
+            "on-tertiary":"#ffffff",
+            "outline-variant":"#c6c6cd",
+            "on-secondary-fixed-variant":"#005323",
+            "surface":"#f8f9ff",
+            "on-error-container":"#93000a",
+            "on-primary-fixed":"#131b2e",
+            "on-tertiary-fixed-variant":"#763300",
+            "surface-container":"#e6eeff",
+            "secondary-fixed":"#95f8a7",
+            "error":"#ba1a1a",
+            "on-primary":"#ffffff",
+            "tertiary-fixed-dim":"#ffb68e",
+            "secondary-fixed-dim":"#79db8d",
+            "tertiary-fixed":"#ffdbca",
+            "surface-variant":"#d5e3fc",
+            "primary":"#000000",
+            "inverse-on-surface":"#eaf1ff",
+            "surface-container-highest":"#d5e3fc",
+            "on-background":"#0d1c2e",
+            "on-primary-fixed-variant":"#3f465c",
+            "on-surface-variant":"#45464d",
+            "on-secondary":"#ffffff"
+          },
+          borderRadius:{DEFAULT:"0.125rem",lg:"0.25rem",xl:"0.5rem",full:"0.75rem"},
+          spacing:{
+            gutter:"1rem",
+            "space-xl":"2rem",
+            "space-lg":"1.5rem",
+            "space-xs":"0.25rem",
+            "space-sm":"0.5rem",
+            "space-base":"1rem",
+            "space-2xs":"0.125rem",
+            "space-md":"0.75rem",
+            "margin-screen":"1.5rem",
+            "space-2xl":"3rem"
+          },
+          fontFamily:{
+            "body-sm":["inter"],
+            "mono-code":["jetbrainsMono"],
+            "mono-data":["jetbrainsMono"],
+            "body-md":["inter"],
+            "label-caps":["inter"],
+            "body-lg":["inter"],
+            "headline-sm":["inter"],
+            "headline-md":["inter"],
+            "display-lg":["inter"]
+          },
+          fontSize:{
+            "body-sm":["12px",{lineHeight:"16px",letterSpacing:"0em",fontWeight:"400"}],
+            "mono-code":["11px",{lineHeight:"16px",letterSpacing:"0.02em",fontWeight:"500"}],
+            "mono-data":["12px",{lineHeight:"18px",letterSpacing:"-0.01em",fontWeight:"400"}],
+            "body-md":["13px",{lineHeight:"20px",letterSpacing:"0em",fontWeight:"400"}],
+            "label-caps":["11px",{lineHeight:"14px",letterSpacing:"0.05em",fontWeight:"600"}],
+            "body-lg":["15px",{lineHeight:"24px",letterSpacing:"-0.005em",fontWeight:"400"}],
+            "headline-sm":["18px",{lineHeight:"26px",letterSpacing:"-0.01em",fontWeight:"600"}],
+            "headline-md":["24px",{lineHeight:"32px",letterSpacing:"-0.015em",fontWeight:"600"}],
+            "display-lg":["32px",{lineHeight:"40px",letterSpacing:"-0.02em",fontWeight:"600"}]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-surface font-body-md text-body-md text-on-surface antialiased">
+  <header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/95 backdrop-blur border-b border-outline-variant/40">
+    <div class="h-16 w-full px-margin-screen flex items-center justify-between gap-space-md">
+      <div class="flex items-center gap-space-lg">
+        <a href="/" class="flex items-center gap-space-md">
+          <img alt="FaceTrace Brand Icon" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UvEJchatjHBZmGPUUpTiqYnKAXiwEHoSFvXeiNS9wlfQZ8BgLvojwHtqy3PqMrIFvBOba0pF9mWBzXAMnIXLdvWZZtfRvL8dtCjcnWNyrRmg3yg70NIdPBl7FCsjj-7iszZaIXoKGat7iXx3mVRGDoeTlDODr_v4AhPWZUo4VnvcT3O0kQjv0uxFAcQIhqLH4EDsdYJBDaeQVrPfOXXz8qETTTGry_e8Yj8cQv5zYAT4FLvN-ypDGOk72N"/>
+          <div class="flex flex-col">
+            <span class="font-headline-sm text-headline-sm text-on-surface tracking-tight leading-none">FaceTrace</span>
+            <span class="font-mono-code text-mono-code text-on-surface-variant uppercase tracking-wider mt-space-2xs">Visual Discovery & Verification</span>
+          </div>
+        </a>
+        <div class="h-6 w-px bg-outline-variant/60 hidden md:block"></div>
+        <nav class="hidden md:flex items-center gap-space-xs">
+          <a class="px-space-md py-space-xs font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" href="/">New Search</a>
+          <a aria-current="page" class="px-space-md py-space-xs transition-colors bg-surface-container-high text-on-surface font-headline-sm font-semibold rounded-lg" href="/results">Results</a>
+          <a class="px-space-md py-space-xs font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" href="/history">History</a>
+          <a class="px-space-md py-space-xs font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" href="/records">Records</a>
+          <a class="px-space-md py-space-xs font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" href="/how-it-works">How It Works</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-space-md">
+        <div class="hidden xl:flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-low border border-outline-variant/40">
+          <span class="w-2 h-2 rounded-full bg-secondary ring-2 ring-secondary-container animate-pulse"></span>
+          <span class="font-mono-code text-mono-code text-on-surface-variant">Network: Public Verification Ledger active</span>
+        </div>
+        <a href="/records" aria-label="Quick search verification registry" class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors">
+          <span class="material-symbols-outlined text-[18px]">search</span>
+        </a>
+        <div class="h-6 w-px bg-outline-variant/60 hidden sm:block"></div>
+        <div class="hidden sm:flex flex-col text-right">
+          <span class="font-label-caps text-label-caps text-on-surface">Forensics Lab 04</span>
+          <span class="font-mono-code text-mono-code text-on-surface-variant">INV-88219</span>
+        </div>
+        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+          <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="w-full pt-16 bg-surface">
+    <div class="flex flex-col w-full">
+      <div class="w-full px-margin-screen py-space-xl max-w-7xl mx-auto flex flex-col gap-space-xl">
+        <!-- SUB-NAVIGATION / AUDIT CONTEXT BREADCRUMB -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm pb-space-sm">
+          <div class="flex items-center gap-space-xs font-mono-code text-mono-code text-on-surface-variant">
+            <a href="/records" class="hover:text-on-surface cursor-pointer">DOSSIER #2025-0849B</a>
+            <span>/</span>
+            <a href="/history" class="hover:text-on-surface cursor-pointer">PIPELINE RUNS</a>
+            <span>/</span>
+            <span class="text-on-surface font-semibold">RUN-9912 (FINALIZED)</span>
+          </div>
+          <div class="flex items-center gap-space-sm">
+            <button class="px-space-md py-1.5 bg-surface-container-lowest hover:bg-surface-container text-on-surface shadow-sm rounded-lg font-body-sm text-body-sm flex items-center gap-space-xs transition-colors" onclick="window.print()" type="button">
+              <span class="material-symbols-outlined text-[15px]">print</span>
+              Export Audit Slip
+            </button>
+            <button class="px-space-md py-1.5 bg-primary hover:bg-on-surface-variant text-on-primary shadow-sm rounded-lg font-body-sm text-body-sm flex items-center gap-space-xs transition-colors" onclick="alert('Docket RUN-9912 attested and signed into ledger block #1,842,910')" type="button">
+              <span class="material-symbols-outlined text-[15px]">verified</span>
+              Attest Docket
+            </button>
+          </div>
+        </div>
+
+        <!-- EVIDENCE SUMMARY METRICS ROW -->
+        <section class="bg-surface-container-lowest shadow-sm rounded-xl p-space-md sm:p-space-lg flex flex-col gap-space-md">
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-space-md">
+            <div class="flex flex-col p-space-sm bg-surface-container-low/60 rounded-lg">
+              <span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">Candidates Found</span>
+              <span class="font-headline-md text-headline-md text-on-surface mt-1">59</span>
+              <span class="font-mono-code text-mono-code text-on-surface-variant mt-0.5">Global index scan</span>
+            </div>
+            <div class="flex flex-col p-space-sm bg-surface-container-low/60 rounded-lg">
+              <span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">Analyzed</span>
+              <span class="font-headline-md text-headline-md text-on-surface mt-1">10</span>
+              <span class="font-mono-code text-mono-code text-on-surface-variant mt-0.5">Top-k deep analysis</span>
+            </div>
+            <div class="flex flex-col p-space-sm bg-surface-container-low/60 rounded-lg">
+              <span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">Visual Matches</span>
+              <span class="font-headline-md text-headline-md text-on-surface mt-1">8</span>
+              <span class="font-mono-code text-mono-code text-secondary font-medium mt-0.5">&gt;75.0% threshold</span>
+            </div>
+            <div class="flex flex-col p-space-sm bg-surface-container-low/60 rounded-lg">
+              <span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">Best Similarity</span>
+              <div class="flex items-baseline gap-1 mt-1">
+                <span class="font-headline-md text-headline-md text-secondary">100</span>
+                <span class="font-mono-code text-mono-code text-secondary font-semibold">%</span>
+              </div>
+              <span class="font-mono-code text-mono-code text-on-surface-variant mt-0.5">Rank #1 alignment</span>
+            </div>
+            <div class="flex flex-col p-space-sm bg-surface-container-low/60 rounded-lg">
+              <span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">Record Status</span>
+              <div class="flex items-center gap-1.5 mt-1">
+                <span class="material-symbols-outlined text-[18px] text-secondary">verified</span>
+                <span class="font-headline-sm text-headline-sm text-on-surface">RECORDED</span>
+              </div>
+              <span class="font-mono-code text-mono-code text-on-surface-variant mt-0.5">Chain sealed</span>
+            </div>
+            <div class="flex flex-col p-space-sm bg-surface-container-low/60 rounded-lg">
+              <span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">Execution Latency</span>
+              <span class="font-headline-md text-headline-md text-on-surface mt-1">4.82<span class="text-body-md font-normal text-on-surface-variant">s</span></span>
+              <span class="font-mono-code text-mono-code text-on-surface-variant mt-0.5">Cuda batch v4.2</span>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center justify-between gap-space-sm pt-space-xs bg-surface-container-low/30 px-space-sm py-1.5 rounded-md">
+            <div class="flex items-center gap-space-sm font-mono-code text-mono-code text-on-surface-variant">
+              <span class="flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                Ledger Proof:
+              </span>
+              <span class="bg-surface-container-lowest px-2 py-0.5 rounded text-on-surface font-semibold tracking-tight shadow-sm cursor-pointer" onclick="navigator.clipboard.writeText('0x7c29bf14a93c7802b'); alert('Ledger proof copied: 0x7c29bf14a93c7802b')">0x7c29...bf14</span>
+              <span class="hidden sm:inline text-on-surface-variant/60">|</span>
+              <span class="hidden sm:inline">Engine: NeuralCos-v3.1-FP16</span>
+            </div>
+            <div class="font-mono-code text-mono-code text-on-surface-variant">
+              Audit timestamp: 2025-05-18 14:02:33 UTC
+            </div>
+          </div>
+        </section>
+
+        <!-- BEST VISUAL MATCH HERO SECTION -->
+        <section class="bg-surface-container-lowest shadow-sm rounded-xl p-space-lg lg:p-space-xl flex flex-col gap-space-lg">
+          <div class="flex flex-wrap items-center justify-between gap-space-sm">
+            <div class="flex items-center gap-space-sm">
+              <span class="px-2.5 py-1 bg-surface-container-high text-on-surface font-label-caps text-label-caps tracking-widest rounded uppercase">
+                Best Visual Match
+              </span>
+              <span class="flex items-center gap-1 px-2.5 py-1 bg-secondary-container/40 text-on-secondary-container font-mono-code text-mono-code rounded font-medium">
+                <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                Rank 1 of 59
+              </span>
+            </div>
+            <span class="font-mono-code text-mono-code text-on-surface-variant">Confidence Weight: 0.99984</span>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
+            <!-- Left: Side by side imagery -->
+            <div class="lg:col-span-6 flex flex-col gap-space-sm">
+              <div class="grid grid-cols-2 gap-space-md">
+                <!-- Probe Image Card -->
+                <div class="flex flex-col bg-surface-container-low rounded-lg p-space-sm">
+                  <div class="flex items-center justify-between pb-space-xs font-mono-code text-mono-code text-on-surface-variant">
+                    <span>PROBE (ORIGIN)</span>
+                    <span class="text-on-surface">512×512</span>
+                  </div>
+                  <div class="relative w-full aspect-square bg-surface-container-highest rounded-lg overflow-hidden">
+                    <img class="w-full h-full object-cover" alt="Forensic probe portrait crop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzdH9ZHLmqddB5-k8i9qFXUzDVjVNwY7vuy73gEGivWdwmHQtgiYhGq2GtygFxYdQQzoozi25-jN8kwRqMKLIvE5nHWCB1P8VpG4Sk_JVNz3BEgVvuINnpKPWZHTybAWitRxjdvaU0zqVvOrCVfy2-uh3hgiUVCNNlO6IpZilXuEd78M47wcbVAWMxJHVco1Vt8ikdeqekKols4MJ-CdW9uAmq8XmUxFpv35dgS2V0yAqQcKQdHAVIxQ"/>
+                    <div class="absolute bottom-2 left-2 px-1.5 py-0.5 bg-primary/80 backdrop-blur text-on-primary font-mono-code text-[10px] rounded">
+                      CROPPED MESH
+                    </div>
+                  </div>
+                  <div class="mt-space-xs flex items-center justify-between text-mono-code font-mono-code text-on-surface-variant">
+                    <span>Hash: 0x48a1...39d0</span>
+                    <span class="text-secondary">EXIF Valid</span>
+                  </div>
+                </div>
+                <!-- Candidate Image Card -->
+                <div class="flex flex-col bg-surface-container-low rounded-lg p-space-sm">
+                  <div class="flex items-center justify-between pb-space-xs font-mono-code text-mono-code text-on-surface-variant">
+                    <span>CANDIDATE #1</span>
+                    <span class="text-on-surface">1600×1200</span>
+                  </div>
+                  <div class="relative w-full aspect-square bg-surface-container-highest rounded-lg overflow-hidden">
+                    <img class="w-full h-full object-cover" alt="Press agency archive photograph" src="https://lh3.googleusercontent.com/aida-public/AB6AXuChUzzoocrh53u9fK33N8AGqiEn8QCwxWT0VKg3SAiITW8BmcPArEXJcG-spiDnEZCaJsfIECoGvqkwFS-eKNdSXWWJiD433ZtV-WY89BWxbrIQo3XHR-DnMwjQhplnaZtr_6Wkp6-ygKlqHAWTUBjW5RMnMChcsA4b37ptKIGFZANDcCotuQGl6PC9rkrYfDwuJiBV0XOTiJSzgblfJl6_P3O8s79q2NmWB5gIYocVo3Z9PccWWxEaiA"/>
+                    <div class="absolute bottom-2 right-2 px-1.5 py-0.5 bg-secondary text-on-secondary font-mono-code text-[10px] rounded flex items-center gap-1">
+                      <span class="material-symbols-outlined text-[10px]">check</span>
+                      100% IDENTICAL
+                    </div>
+                  </div>
+                  <div class="mt-space-xs flex items-center justify-between text-mono-code font-mono-code text-on-surface-variant">
+                    <span>Source: Web crawl</span>
+                    <span>SHA: 0x93e4...b71c</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Feature Alignment Visual Strip -->
+              <div class="bg-surface-container-low/70 p-space-sm rounded-lg flex items-center justify-between font-mono-code text-mono-code text-on-surface-variant">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-secondary text-[16px]">compare_arrows</span>
+                  <span>Facial Landmarks (68-pt Dlib): <strong class="text-on-surface">0.0024px dev.</strong></span>
+                </div>
+                <span class="text-secondary font-semibold">Exact Match</span>
+              </div>
+            </div>
+            <!-- Right: Metadata & Verdict Docket -->
+            <div class="lg:col-span-6 flex flex-col justify-between h-full gap-space-md">
+              <div class="flex flex-col gap-space-md">
+                <div class="flex items-start justify-between gap-space-md">
+                  <div>
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-secondary-container/50 text-on-secondary-container rounded-full font-mono-code text-mono-code font-semibold">
+                      <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+                      100.00% Visual Similarity
+                    </div>
+                    <h3 class="font-headline-sm text-headline-sm text-on-surface mt-space-sm leading-snug">
+                      Press photo release — Berlin Technology Forum Keynote Speaker
+                    </h3>
+                  </div>
+                </div>
+                <!-- Mandatory Forensic Disclaimer Callout -->
+                <div class="p-space-sm bg-surface-container-high/40 rounded-lg flex items-start gap-space-sm">
+                  <span class="material-symbols-outlined text-on-surface-variant text-[18px] mt-0.5">info</span>
+                  <div class="flex flex-col">
+                    <span class="font-label-caps text-label-caps uppercase text-on-surface">Forensic Evidentiary Notice</span>
+                    <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+                      Visual similarity result represents cosine proximity in vector space — not positive legal identity proof. Corroborate via independent biometric or documentary chain of custody.
+                    </p>
+                  </div>
+                </div>
+                <!-- Detailed Meta Table -->
+                <div class="bg-surface-container-low/60 rounded-lg p-space-md flex flex-col gap-space-xs font-mono-data text-mono-data">
+                  <div class="flex justify-between py-1 border-b border-outline-variant/30">
+                    <span class="text-on-surface-variant">Source Domain</span>
+                    <span class="text-on-surface font-semibold flex items-center gap-1">
+                      archive.reuters-journal.org
+                      <span class="material-symbols-outlined text-[14px] text-secondary">verified_user</span>
+                    </span>
+                  </div>
+                  <div class="flex justify-between py-1 border-b border-outline-variant/30">
+                    <span class="text-on-surface-variant">Capture / Publication Date</span>
+                    <span class="text-on-surface">Oct 14, 2023 · 11:24:08 CEST</span>
+                  </div>
+                  <div class="flex justify-between py-1 border-b border-outline-variant/30">
+                    <span class="text-on-surface-variant">Native Media Resolution</span>
+                    <span class="text-on-surface">1600 × 1200 px (300 DPI, sRGB)</span>
+                  </div>
+                  <div class="flex justify-between py-1">
+                    <span class="text-on-surface-variant">Crawled URI Hash</span>
+                    <span class="text-on-surface-variant font-mono-code truncate max-w-[240px]">sha256:d512a86c7b94e09f...a801</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Actions -->
+              <div class="flex flex-wrap items-center gap-space-sm pt-space-xs">
+                <a class="px-space-md py-2 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-lg font-body-sm text-body-sm font-medium flex items-center gap-space-xs shadow-sm transition-colors" href="https://archive.reuters-journal.org" rel="noopener noreferrer" target="_blank">
+                  <span>Open Source Asset</span>
+                  <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+                </a>
+                <button class="px-space-md py-2 bg-primary hover:bg-on-surface-variant text-on-primary rounded-lg font-body-sm text-body-sm font-medium flex items-center gap-space-xs shadow-sm transition-colors" type="button" onclick="alert('Added Candidate #1 to Formal Evidence Docket')">
+                  <span class="material-symbols-outlined text-[16px]">post_add</span>
+                  <span>Add to Formal Evidence Docket</span>
+                </button>
+                <button aria-label="More candidate actions" class="w-9 h-9 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface-variant flex items-center justify-center transition-colors" type="button" onclick="alert('Candidate Actions: Export, Flag, Compare')">
+                  <span class="material-symbols-outlined text-[18px]">more_vert</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CANDIDATE RESULTS EXPLORER -->
+        <section class="flex flex-col gap-space-md">
+          <!-- Filter and Tab Bar -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md bg-surface-container-lowest p-space-sm rounded-xl shadow-sm">
+            <!-- Tab Navigation -->
+            <div class="flex flex-wrap items-center gap-1" id="candidateTabs">
+              <button class="tab-btn px-space-md py-1.5 rounded-lg font-body-sm text-body-sm font-medium bg-primary text-on-primary transition-colors" type="button">
+                All Results (10)
+              </button>
+              <button class="tab-btn px-space-md py-1.5 rounded-lg font-body-sm text-body-sm font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" type="button">
+                Visual Matches (8)
+              </button>
+              <button class="tab-btn px-space-md py-1.5 rounded-lg font-body-sm text-body-sm font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" type="button">
+                Social Platforms (3)
+              </button>
+              <button class="tab-btn px-space-md py-1.5 rounded-lg font-body-sm text-body-sm font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" type="button">
+                News / Press (5)
+              </button>
+            </div>
+            <!-- Controls: Search / Sort -->
+            <div class="flex items-center gap-space-sm px-space-xs">
+              <div class="relative flex items-center">
+                <span class="material-symbols-outlined absolute left-2.5 text-on-surface-variant text-[16px]">filter_list</span>
+                <input class="pl-8 pr-space-md py-1 bg-surface-container-low text-on-surface placeholder:text-on-surface-variant font-mono-data text-mono-data rounded-lg focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary w-48 lg:w-60" placeholder="Filter domain or hash..." type="text"/>
+              </div>
+              <span class="font-mono-code text-mono-code text-on-surface-variant hidden lg:inline">Sort: Similarity (Desc)</span>
+            </div>
+          </div>
+
+          <!-- Candidate Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-space-md">
+            <!-- CARD 1 -->
+            <div class="bg-surface-container-lowest rounded-xl p-space-sm shadow-sm flex flex-col justify-between gap-space-sm hover:shadow-md transition-shadow group">
+              <div class="flex flex-col gap-space-xs">
+                <div class="relative w-full aspect-[4/3] bg-surface-container-highest rounded-lg overflow-hidden">
+                  <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Archival close-up face crop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8Dj_v_Hw3zfsUpKBzizjtBDxfijmp9zz0TdaZKPjTIj5lDg7K3P30VRPSvthTyJd6Dj9W7ra_HmYWStuuThfgmp5x-BVIDh6J_egbNB5XEFWvDOvvZNfA6PPi0T_OkZzaplS2-GuO6GD5EGj3PTimQpifDTsIpBqB_7Y7no7hx1qQL8PaIgnE-2PdLYVRdvsWT1sDgE5owslEVu6UXltfLL-wb0xCTrLqo_cs_psyldK-6urVssPkpg"/>
+                  <div class="absolute top-2 left-2 px-1.5 py-0.5 bg-primary/90 text-on-primary font-mono-code text-[10px] rounded">#1</div>
+                  <div class="absolute top-2 right-2 px-1.5 py-0.5 bg-secondary text-on-secondary font-mono-code text-[10px] rounded font-semibold">100%</div>
+                </div>
+                <div class="flex items-center justify-between pt-1">
+                  <span class="font-mono-code text-mono-code text-secondary font-medium flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                    Visual Match
+                  </span>
+                  <span class="font-mono-code text-[10px] text-on-surface-variant">ID: 8841-A</span>
+                </div>
+                <p class="font-body-md text-body-md text-on-surface font-medium truncate" title="archive.reuters-journal.org">
+                  archive.reuters-journal.org
+                </p>
+                <span class="font-mono-data text-mono-data text-on-surface-variant truncate">
+                  Path: /releases/berlin-keynote.jpg
+                </span>
+              </div>
+              <div class="pt-space-xs border-t border-outline-variant/20 flex items-center justify-between">
+                <span class="font-mono-code text-[10px] text-on-surface-variant">300 DPI</span>
+                <a class="font-body-sm text-body-sm text-primary hover:text-on-surface-variant font-medium flex items-center gap-0.5" href="https://archive.reuters-journal.org" target="_blank" rel="noopener noreferrer">
+                  Open Source <span class="material-symbols-outlined text-[13px]">north_east</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- CARD 2 -->
+            <div class="bg-surface-container-lowest rounded-xl p-space-sm shadow-sm flex flex-col justify-between gap-space-sm hover:shadow-md transition-shadow group">
+              <div class="flex flex-col gap-space-xs">
+                <div class="relative w-full aspect-[4/3] bg-surface-container-highest rounded-lg overflow-hidden">
+                  <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Conference speaker panel photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCE-4RoZOTSL8XBuNzuKV1sGVzxc6JexoC4NV4br__8g16zmRZZfepB0UTHVuWKKCs8WH5Yc8wOa6SikwQFQ5b3AE3tSszv1l0YHtNY_kLUigXv4TTTObN59RKlec3q4ITFtZ3QGdVDSbSj51ZePB28MVJ5VkEcz4d4JcqQCvFDeti5_hW_x1jzj5rOgwtepVmhzpCJZFuSwqhWZY5It1hOJRPsUctwoJLFOCAh3wugNgh7Dfn9GUj1VA"/>
+                  <div class="absolute top-2 left-2 px-1.5 py-0.5 bg-primary/90 text-on-primary font-mono-code text-[10px] rounded">#2</div>
+                  <div class="absolute top-2 right-2 px-1.5 py-0.5 bg-secondary text-on-secondary font-mono-code text-[10px] rounded font-semibold">94.2%</div>
+                </div>
+                <div class="flex items-center justify-between pt-1">
+                  <span class="font-mono-code text-mono-code text-secondary font-medium flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                    Visual Match
+                  </span>
+                  <span class="font-mono-code text-[10px] text-on-surface-variant">ID: 8841-B</span>
+                </div>
+                <p class="font-body-md text-body-md text-on-surface font-medium truncate" title="global-tech-summit.eu">
+                  global-tech-summit.eu
+                </p>
+                <span class="font-mono-data text-mono-data text-on-surface-variant truncate">
+                  Path: /speakers/2023/gallery.html
+                </span>
+              </div>
+              <div class="pt-space-xs border-t border-outline-variant/20 flex items-center justify-between">
+                <span class="font-mono-code text-[10px] text-on-surface-variant">72 DPI Web</span>
+                <a class="font-body-sm text-body-sm text-primary hover:text-on-surface-variant font-medium flex items-center gap-0.5" href="https://global-tech-summit.eu" target="_blank" rel="noopener noreferrer">
+                  Open Source <span class="material-symbols-outlined text-[13px]">north_east</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- CARD 3 -->
+            <div class="bg-surface-container-lowest rounded-xl p-space-sm shadow-sm flex flex-col justify-between gap-space-sm hover:shadow-md transition-shadow group">
+              <div class="flex flex-col gap-space-xs">
+                <div class="relative w-full aspect-[4/3] bg-surface-container-highest rounded-lg overflow-hidden">
+                  <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Wikimedia commons uploaded event portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQV4vSC_7yZgLHKczGxo-Fratr9os5Nq17ZnhPZlAXpLAhlSJIuES-sIcPJg66qUZ7aSHsdidYFY-y1X--HgPfsud8_DxUnFYexCNSf9jKU7IaFFv2M5SQDhrwQAeKLxZfMaWhNYX2fB-OslQ4TD1J5QJqt7vwLJTF_2HF4cZ7UvrqwgP-yqodK8EpkloRNYcGaoxZHg-4MHl-OHKXXylJssJWaTwyWTDmcp1iWC7OtC6MoZt3fQ4NFg"/>
+                  <div class="absolute top-2 left-2 px-1.5 py-0.5 bg-primary/90 text-on-primary font-mono-code text-[10px] rounded">#3</div>
+                  <div class="absolute top-2 right-2 px-1.5 py-0.5 bg-surface-container-highest text-on-surface font-mono-code text-[10px] rounded font-semibold">89.7%</div>
+                </div>
+                <div class="flex items-center justify-between pt-1">
+                  <span class="font-mono-code text-mono-code text-on-surface-variant font-medium flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                    Accessible
+                  </span>
+                  <span class="font-mono-code text-[10px] text-on-surface-variant">ID: 8841-C</span>
+                </div>
+                <p class="font-body-md text-body-md text-on-surface font-medium truncate" title="wikimedia.org/wiki/File:Symp...">
+                  wikimedia.org/wiki/File:Symp...
+                </p>
+                <span class="font-mono-data text-mono-data text-on-surface-variant truncate">
+                  License: CC-BY-SA 4.0
+                </span>
+              </div>
+              <div class="pt-space-xs border-t border-outline-variant/20 flex items-center justify-between">
+                <span class="font-mono-code text-[10px] text-on-surface-variant">Lossless PNG</span>
+                <a class="font-body-sm text-body-sm text-primary hover:text-on-surface-variant font-medium flex items-center gap-0.5" href="https://wikimedia.org" target="_blank" rel="noopener noreferrer">
+                  Open Source <span class="material-symbols-outlined text-[13px]">north_east</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- CARD 4 -->
+            <div class="bg-surface-container-lowest rounded-xl p-space-sm shadow-sm flex flex-col justify-between gap-space-sm hover:shadow-md transition-shadow group">
+              <div class="flex flex-col gap-space-xs">
+                <div class="relative w-full aspect-[4/3] bg-surface-container-highest rounded-lg overflow-hidden">
+                  <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Press agency stock portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfP_hEmiuWufXUX8kbldRcgtVgGFdDoo3_BlDgRRnt8D9jy5rsvuTZI8UTzBJ11MbK1GK9wLbPlPbwBcJt8Dvpsf1tm8OPl8IVFqrBnUaLNHeBUuyVQ3ZY5QIpV5zvFq4_5xIZ_TBxQsbX7qNXu_PBUiX6ae4CPBbKGaTbboPuDeOWo8NibKv35Xm2cyzYav60NtgkKuGDlcg6DBmr1J3KsKK47dwgZ6w7GwS4j8ONrVXt3M78NMvl-w"/>
+                  <div class="absolute top-2 left-2 px-1.5 py-0.5 bg-primary/90 text-on-primary font-mono-code text-[10px] rounded">#4</div>
+                  <div class="absolute top-2 right-2 px-1.5 py-0.5 bg-surface-container-highest text-on-surface font-mono-code text-[10px] rounded font-semibold">76.1%</div>
+                </div>
+                <div class="flex items-center justify-between pt-1">
+                  <span class="font-mono-code text-mono-code text-on-surface-variant font-medium flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                    Accessible
+                  </span>
+                  <span class="font-mono-code text-[10px] text-on-surface-variant">ID: 8841-D</span>
+                </div>
+                <p class="font-body-md text-body-md text-on-surface font-medium truncate" title="photobank.apnews.com">
+                  photobank.apnews.com
+                </p>
+                <span class="font-mono-data text-mono-data text-on-surface-variant truncate">
+                  Editorial wire archive
+                </span>
+              </div>
+              <div class="pt-space-xs border-t border-outline-variant/20 flex items-center justify-between">
+                <span class="font-mono-code text-[10px] text-on-surface-variant">JPEG Compressed</span>
+                <a class="font-body-sm text-body-sm text-primary hover:text-on-surface-variant font-medium flex items-center gap-0.5" href="https://photobank.apnews.com" target="_blank" rel="noopener noreferrer">
+                  Open Source <span class="material-symbols-outlined text-[13px]">north_east</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- CARD 5 (Failed / No Usable Face) -->
+            <div class="bg-surface-container-lowest rounded-xl p-space-sm shadow-sm flex flex-col justify-between gap-space-sm hover:shadow-md transition-shadow opacity-85">
+              <div class="flex flex-col gap-space-xs">
+                <div class="relative w-full aspect-[4/3] bg-surface-container-low rounded-lg flex flex-col items-center justify-center text-center p-space-sm">
+                  <span class="material-symbols-outlined text-error text-[28px]">broken_image</span>
+                  <span class="font-mono-code text-mono-code text-error font-medium mt-1">No Usable Face</span>
+                  <span class="font-mono-code text-[10px] text-on-surface-variant">Resolution &lt;64px / blurred</span>
+                  <div class="absolute top-2 left-2 px-1.5 py-0.5 bg-surface-container-high text-on-surface font-mono-code text-[10px] rounded">#5</div>
+                  <div class="absolute top-2 right-2 px-1.5 py-0.5 bg-error-container text-on-error-container font-mono-code text-[10px] rounded font-semibold">N/A</div>
+                </div>
+                <div class="flex items-center justify-between pt-1">
+                  <span class="font-mono-code text-mono-code text-error font-medium flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                    Download Failed
+                  </span>
+                  <span class="font-mono-code text-[10px] text-on-surface-variant">ID: 8841-E</span>
+                </div>
+                <p class="font-body-md text-body-md text-on-surface-variant font-medium truncate" title="social-cdn.network/u8492">
+                  social-cdn.network/u8492
+                </p>
+                <span class="font-mono-data text-mono-data text-on-surface-variant truncate">
+                  Payload: HTTP 404 / Corrupt
+                </span>
+              </div>
+              <div class="pt-space-xs border-t border-outline-variant/20 flex items-center justify-between">
+                <span class="font-mono-code text-[10px] text-on-surface-variant">Unresolved</span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant/60">Skipped</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TWO-COLUMN SECTION: EVIDENCE RECORD + INDEPENDENT VERIFICATION -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-stretch">
+          <!-- EVIDENCE RECORD (LEFT 7 COLS) -->
+          <section class="lg:col-span-7 bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between gap-space-md">
+            <div class="flex flex-col gap-space-sm">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-space-sm">
+                  <span class="material-symbols-outlined text-primary text-[22px]">history_edu</span>
+                  <h3 class="font-headline-sm text-headline-sm text-on-surface">Evidence Record</h3>
+                </div>
+                <span class="px-2.5 py-1 bg-secondary-container/40 text-on-secondary-container font-mono-code text-mono-code rounded-full font-semibold flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                  RECORDED
+                </span>
+              </div>
+              <p class="font-body-md text-body-md text-on-surface-variant">
+                A tamper-evident fingerprint of the selected evidence docket and metadata payload has been recorded into the distributed verification root.
+              </p>
+            </div>
+
+            <!-- Monospace Technical Ledger Grid -->
+            <div class="bg-surface-container-low/80 rounded-lg p-space-md flex flex-col gap-space-xs font-mono-code text-mono-code">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 border-b border-outline-variant/30 gap-1">
+                <span class="text-on-surface-variant">Record ID</span>
+                <div class="flex items-center gap-1 text-on-surface font-semibold">
+                  <span>REC-2025-0849B-9912</span>
+                  <button class="material-symbols-outlined text-[14px] text-on-surface-variant hover:text-secondary p-0.5" onclick="navigator.clipboard.writeText('REC-2025-0849B-9912'); this.innerText='done'; setTimeout(()=>this.innerText='content_copy', 1500);" title="Copy Record ID" type="button">content_copy</button>
+                </div>
+              </div>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 border-b border-outline-variant/30 gap-1">
+                <span class="text-on-surface-variant">SHA-256 Fingerprint</span>
+                <div class="flex items-center gap-1 text-on-surface">
+                  <span title="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855">e3b0c44298fc...7852b855</span>
+                  <button class="material-symbols-outlined text-[14px] text-on-surface-variant hover:text-secondary p-0.5" onclick="navigator.clipboard.writeText('e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'); this.innerText='done'; setTimeout(()=>this.innerText='content_copy', 1500);" title="Copy SHA-256" type="button">content_copy</button>
+                </div>
+              </div>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 border-b border-outline-variant/30 gap-1">
+                <span class="text-on-surface-variant">Block Number</span>
+                <span class="text-on-surface font-semibold">#1,842,910</span>
+              </div>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 border-b border-outline-variant/30 gap-1">
+                <span class="text-on-surface-variant">Block Hash</span>
+                <div class="flex items-center gap-1 text-on-surface">
+                  <span title="0x9a8f2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b">0x9a8f2c3d...8e9f0a1b</span>
+                  <button class="material-symbols-outlined text-[14px] text-on-surface-variant hover:text-secondary p-0.5" onclick="navigator.clipboard.writeText('0x9a8f2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b'); this.innerText='done'; setTimeout(()=>this.innerText='content_copy', 1500);" title="Copy Block Hash" type="button">content_copy</button>
+                </div>
+              </div>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 border-b border-outline-variant/30 gap-1">
+                <span class="text-on-surface-variant">Previous Block Hash</span>
+                <span class="text-on-surface">0x4f12...e89a</span>
+              </div>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 gap-1">
+                <span class="text-on-surface-variant">Timestamp</span>
+                <span class="text-on-surface">2025-05-18 14:02:29 UTC (Synced Stratum-1)</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between text-mono-code font-mono-code text-on-surface-variant pt-space-xs">
+              <span>Merkle Root: 0x5b39e2…a901</span>
+              <span class="text-secondary flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px]">lock</span>
+                Immutable & Sealed
+              </span>
+            </div>
+          </section>
+
+          <!-- INDEPENDENT VERIFICATION (RIGHT 5 COLS) -->
+          <section class="lg:col-span-5 bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between gap-space-md">
+            <div class="flex flex-col gap-space-xs">
+              <div class="flex items-center gap-space-sm">
+                <span class="material-symbols-outlined text-secondary text-[22px]">policy</span>
+                <h3 class="font-headline-sm text-headline-sm text-on-surface">Independent Verification</h3>
+              </div>
+              <p class="font-body-md text-body-md text-on-surface-variant">
+                Recalculate the evidence fingerprint locally and verify it directly against the tamper-evident ledger node.
+              </p>
+            </div>
+            <!-- Verified Banner Box -->
+            <div class="p-space-md bg-secondary-container/25 rounded-xl flex flex-col gap-space-sm">
+              <div class="flex items-start gap-space-sm">
+                <span class="material-symbols-outlined text-secondary text-[20px] mt-0.5">check_circle</span>
+                <div class="flex flex-col">
+                  <span class="font-label-caps text-label-caps uppercase text-on-secondary-container font-semibold">Integrity Verified</span>
+                  <span class="font-body-sm text-body-sm text-on-surface mt-0.5 font-medium">
+                    The current evidence fingerprint matches the fingerprint stored in the evidence record.
+                  </span>
+                </div>
+              </div>
+              <!-- 3-point check list -->
+              <div class="bg-surface-container-lowest/80 rounded-lg p-space-sm flex flex-col gap-1.5 font-mono-code text-mono-code">
+                <div class="flex items-center justify-between py-0.5">
+                  <span class="text-on-surface-variant">Stored Fingerprint:</span>
+                  <span class="text-secondary font-semibold flex items-center gap-1">
+                    Match <span class="material-symbols-outlined text-[14px]">check</span>
+                  </span>
+                </div>
+                <div class="flex items-center justify-between py-0.5">
+                  <span class="text-on-surface-variant">Current Fingerprint:</span>
+                  <span class="text-secondary font-semibold flex items-center gap-1">
+                    Match <span class="material-symbols-outlined text-[14px]">check</span>
+                  </span>
+                </div>
+                <div class="flex items-center justify-between py-0.5">
+                  <span class="text-on-surface-variant">Chain Integrity:</span>
+                  <span class="text-secondary font-semibold flex items-center gap-1">
+                    Valid <span class="material-symbols-outlined text-[14px]">check</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <!-- Re-verify Trigger -->
+            <div class="flex flex-col gap-space-xs">
+              <button class="w-full py-2 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-lg font-body-sm text-body-sm font-medium flex items-center justify-center gap-space-xs transition-colors" id="recalcBtn" onclick="runRecalculation()" type="button">
+                <span class="material-symbols-outlined text-[16px]">refresh</span>
+                <span>Recalculate & Attest Fingerprint</span>
+              </button>
+              <span class="font-mono-code text-[10px] text-center text-on-surface-variant">
+                Zero-knowledge client-side SHA-256 rehash
+              </span>
+            </div>
+          </section>
+        </div>
+
+        <!-- TECHNICAL EVIDENCE ACCORDION -->
+        <section class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+          <button class="w-full px-space-lg py-space-md flex items-center justify-between bg-surface-container-lowest hover:bg-surface-container-low transition-colors text-left" id="accordionToggle" onclick="toggleTechAccordion()" type="button">
+            <div class="flex items-center gap-space-md">
+              <span class="material-symbols-outlined text-primary text-[20px]">terminal</span>
+              <div class="flex flex-col">
+                <span class="font-headline-sm text-headline-sm text-on-surface">View Technical Evidence</span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant">Pipeline diagnostics, latent vector attributes, and candidate log for reviewers and judges</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-space-sm">
+              <span class="font-mono-code text-mono-code text-secondary bg-secondary-container/40 px-2 py-0.5 rounded">All Tests Passed</span>
+              <span class="material-symbols-outlined text-on-surface-variant text-[20px] transition-transform duration-200" id="accordionChevron">expand_more</span>
+            </div>
+          </button>
+          <div class="hidden flex flex-col p-space-lg gap-space-lg bg-surface-container-low/40" id="accordionContent">
+            <!-- Processing Pipeline Summary Row -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-space-sm">
+              <div class="bg-surface-container-lowest p-space-sm rounded-lg flex flex-col shadow-sm">
+                <span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Downloads Successful</span>
+                <span class="font-headline-md text-headline-md text-on-surface mt-1">9 / 10</span>
+                <span class="font-mono-code text-[10px] text-secondary mt-0.5">90.0% Network Success</span>
+              </div>
+              <div class="bg-surface-container-lowest p-space-sm rounded-lg flex flex-col shadow-sm">
+                <span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Downloads Failed</span>
+                <span class="font-headline-md text-headline-md text-error mt-1">1</span>
+                <span class="font-mono-code text-[10px] text-on-surface-variant mt-0.5">HTTP 404 / Dropped</span>
+              </div>
+              <div class="bg-surface-container-lowest p-space-sm rounded-lg flex flex-col shadow-sm">
+                <span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Faces Compared</span>
+                <span class="font-headline-md text-headline-md text-on-surface mt-1">8</span>
+                <span class="font-mono-code text-[10px] text-secondary mt-0.5">Valid Latent Vectors</span>
+              </div>
+              <div class="bg-surface-container-lowest p-space-sm rounded-lg flex flex-col shadow-sm">
+                <span class="font-label-caps text-label-caps text-on-surface-variant uppercase">No Usable Face</span>
+                <span class="font-headline-md text-headline-md text-on-surface mt-1">1</span>
+                <span class="font-mono-code text-[10px] text-on-surface-variant mt-0.5">Below 0.4 Det Threshold</span>
+              </div>
+            </div>
+            <!-- Pipeline Execution Stages Table -->
+            <div class="flex flex-col gap-space-xs">
+              <span class="font-label-caps text-label-caps uppercase text-on-surface tracking-wider">Pipeline Stage Execution Telemetry</span>
+              <div class="bg-surface-container-lowest rounded-lg shadow-sm overflow-x-auto">
+                <table class="w-full text-left font-mono-data text-mono-data">
+                  <thead class="bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps uppercase">
+                    <tr>
+                      <th class="py-2.5 px-space-md">Stage</th>
+                      <th class="py-2.5 px-space-md">Status</th>
+                      <th class="py-2.5 px-space-md">Execution Telemetry / Notes</th>
+                      <th class="py-2.5 px-space-md text-right">Duration</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-on-surface divide-y divide-outline-variant/20">
+                    <tr class="hover:bg-surface-container-low/50">
+                      <td class="py-2.5 px-space-md font-semibold">Face Detection</td>
+                      <td class="py-2.5 px-space-md text-secondary flex items-center gap-1 mt-1">
+                        <span class="material-symbols-outlined text-[14px]">check_circle</span> Complete
+                      </td>
+                      <td class="py-2.5 px-space-md text-on-surface-variant">Single face detected in probe asset (confidence 99.8%, 68 landmarks aligned)</td>
+                      <td class="py-2.5 px-space-md text-right font-mono-code">142ms</td>
+                    </tr>
+                    <tr class="hover:bg-surface-container-low/50">
+                      <td class="py-2.5 px-space-md font-semibold">Latent Embedding</td>
+                      <td class="py-2.5 px-space-md text-secondary flex items-center gap-1 mt-1">
+                        <span class="material-symbols-outlined text-[14px]">check_circle</span> Complete
+                      </td>
+                      <td class="py-2.5 px-space-md text-on-surface-variant">512-d normalized latent vector generated via ResNet-50 OSINT model</td>
+                      <td class="py-2.5 px-space-md text-right font-mono-code">88ms</td>
+                    </tr>
+                    <tr class="hover:bg-surface-container-low/50">
+                      <td class="py-2.5 px-space-md font-semibold">Vector Index Search</td>
+                      <td class="py-2.5 px-space-md text-secondary flex items-center gap-1 mt-1">
+                        <span class="material-symbols-outlined text-[14px]">check_circle</span> Complete
+                      </td>
+                      <td class="py-2.5 px-space-md text-on-surface-variant">59 candidates returned from public open index partitions (HNSW search, M=16)</td>
+                      <td class="py-2.5 px-space-md text-right font-mono-code">1.24s</td>
+                    </tr>
+                    <tr class="hover:bg-surface-container-low/50">
+                      <td class="py-2.5 px-space-md font-semibold">Similarity Comparison</td>
+                      <td class="py-2.5 px-space-md text-secondary flex items-center gap-1 mt-1">
+                        <span class="material-symbols-outlined text-[14px]">check_circle</span> Complete
+                      </td>
+                      <td class="py-2.5 px-space-md text-on-surface-variant">10 candidates analyzed via pairwise cosine similarity & geometric alignment</td>
+                      <td class="py-2.5 px-space-md text-right font-mono-code">2.88s</td>
+                    </tr>
+                    <tr class="hover:bg-surface-container-low/50">
+                      <td class="py-2.5 px-space-md font-semibold">Evidence Ledger Notarization</td>
+                      <td class="py-2.5 px-space-md text-secondary flex items-center gap-1 mt-1">
+                        <span class="material-symbols-outlined text-[14px]">check_circle</span> Complete
+                      </td>
+                      <td class="py-2.5 px-space-md text-on-surface-variant">Fingerprint recorded to block #1,842,910 with IEEE-2601 chain stamp</td>
+                      <td class="py-2.5 px-space-md text-right font-mono-code">468ms</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <!-- Per-Candidate Detailed Audit Table -->
+            <div class="flex flex-col gap-space-xs">
+              <span class="font-label-caps text-label-caps uppercase text-on-surface tracking-wider">Per-Candidate Detailed Audit</span>
+              <div class="bg-surface-container-lowest rounded-lg shadow-sm overflow-x-auto">
+                <table class="w-full text-left font-mono-data text-mono-data">
+                  <thead class="bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps uppercase">
+                    <tr>
+                      <th class="py-2 px-space-md">Candidate Index</th>
+                      <th class="py-2 px-space-md">Source Domain</th>
+                      <th class="py-2 px-space-md">Outcome</th>
+                      <th class="py-2 px-space-md">Similarity</th>
+                      <th class="py-2 px-space-md">Notes</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-on-surface divide-y divide-outline-variant/20">
+                    <tr class="hover:bg-surface-container-low/50">
+                      <td class="py-2 px-space-md font-semibold">CAN-01 (Rank #1)</td>
+                      <td class="py-2 px-space-md text-on-surface">archive.reuters-journal.org</td>
+                      <td class="py-2 px-space-md text-secondary font-medium">Visual Match</td>
+                      <td class="py-2 px-space-md font-semibold text-secondary">100.00%</td>
+                      <td class="py-2 px-space-md text-on-surface-variant">Full crop resolution match; zero spatial drift</td>
+                    </tr>
+                    <tr class="hover:bg-surface-container-low/50">
+                      <td class="py-2 px-space-md font-semibold">CAN-02 (Rank #2)</td>
+                      <td class="py-2 px-space-md text-on-surface">global-tech-summit.eu</td>
+                      <td class="py-2 px-space-md text-secondary font-medium">Visual Match</td>
+                      <td class="py-2 px-space-md font-semibold text-secondary">94.20%</td>
+                      <td class="py-2 px-space-md text-on-surface-variant">Stage lighting variant; 4.1 deg head tilt</td>
+                    </tr>
+                    <tr class="hover:bg-surface-container-low/50">
+                      <td class="py-2 px-space-md font-semibold">CAN-03 (Rank #3)</td>
+                      <td class="py-2 px-space-md text-on-surface">wikimedia.org</td>
+                      <td class="py-2 px-space-md text-on-surface font-medium">Accessible Match</td>
+                      <td class="py-2 px-space-md font-semibold">89.70%</td>
+                      <td class="py-2 px-space-md text-on-surface-variant">Event panel wide shot crop; slight motion blur</td>
+                    </tr>
+                    <tr class="hover:bg-surface-container-low/50">
+                      <td class="py-2 px-space-md font-semibold">CAN-04 (Rank #4)</td>
+                      <td class="py-2 px-space-md text-on-surface">photobank.apnews.com</td>
+                      <td class="py-2 px-space-md text-on-surface font-medium">Accessible Match</td>
+                      <td class="py-2 px-space-md font-semibold">76.10%</td>
+                      <td class="py-2 px-space-md text-on-surface-variant">Side profile 35 deg; shadow occludes jawline</td>
+                    </tr>
+                    <tr class="hover:bg-surface-container-low/50">
+                      <td class="py-2 px-space-md font-semibold">CAN-05 (Rank #5)</td>
+                      <td class="py-2 px-space-md text-on-surface">social-cdn.network</td>
+                      <td class="py-2 px-space-md text-error font-medium">Download Failed</td>
+                      <td class="py-2 px-space-md text-on-surface-variant">N/A</td>
+                      <td class="py-2 px-space-md text-on-surface-variant">Remote server returned 404 Not Found</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- WORKFLOW ACTIONS FOOTER BAR -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-space-md pt-space-sm pb-space-lg text-on-surface-variant font-mono-code text-mono-code">
+          <div class="flex items-center gap-space-sm">
+            <span class="material-symbols-outlined text-[16px] text-secondary">shield</span>
+            <span>Cryptographic Audit Root: SHA256/secp256k1</span>
+          </div>
+          <div class="flex items-center gap-space-md">
+            <button class="hover:text-on-surface transition-colors" type="button" onclick="alert('RAW JSON-LD exported')">Download RAW JSON-LD</button>
+            <span>·</span>
+            <button class="hover:text-on-surface transition-colors" type="button" onclick="window.print()">Generate Court-Ready PDF</button>
+            <span>·</span>
+            <button class="hover:text-on-surface transition-colors" type="button" onclick="alert('Cache purged')">Purge Cache</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="w-full bg-surface-container-lowest border-t border-outline-variant/40 py-space-lg">
+    <div class="w-full px-margin-screen flex flex-col md:flex-row items-center justify-between gap-space-md font-mono-data text-mono-data text-on-surface-variant">
+      <div>© 2025 FaceTrace Intelligence System. Cryptographically sealed audit logs.</div>
+      <div class="flex items-center gap-space-lg">
+        <span class="font-label-caps text-label-caps uppercase text-secondary">Chain of Custody Standard IEEE-2601</span>
+        <span class="font-mono-code text-mono-code">SHA-256 Verified Root</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function toggleTechAccordion() {
+      const content = document.getElementById('accordionContent');
+      const chevron = document.getElementById('accordionChevron');
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        chevron.classList.add('rotate-180');
+      } else {
+        content.classList.add('hidden');
+        chevron.classList.remove('rotate-180');
+      }
+    }
+
+    function runRecalculation() {
+      const btn = document.getElementById('recalcBtn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<span class="material-symbols-outlined text-[16px] animate-spin">progress_activity</span><span>Re-hashing SHA-256 blocks...</span>';
+      btn.disabled = true;
+      setTimeout(() => {
+        btn.innerHTML = '<span class="material-symbols-outlined text-[16px] text-secondary">check</span><span>Re-verification 100% Confirmed</span>';
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }, 2500);
+      }, 1200);
+    }
+
+    document.querySelectorAll('#candidateTabs .tab-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('#candidateTabs .tab-btn').forEach(b => {
+          b.classList.remove('bg-primary', 'text-on-primary');
+          b.classList.add('text-on-surface-variant', 'hover:text-on-surface', 'hover:bg-surface-container-low');
+        });
+        button.classList.add('bg-primary', 'text-on-primary');
+        button.classList.remove('text-on-surface-variant', 'hover:text-on-surface', 'hover:bg-surface-container-low');
+      });
+    });
+  </script>
+</body>
+</html>

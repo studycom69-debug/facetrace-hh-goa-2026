@@ -1,30 +1,39 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { runPipelineSequential } from '../api'
 import CandidateCard from '../components/CandidateCard'
+import CandidateStreamPreview from '../components/CandidateStreamPreview'
+import ForensicStepper from '../components/ForensicStepper'
 import MaterialIcon from '../components/MaterialIcon'
-import PipelineSteps from '../components/PipelineSteps'
+import PipelineActivityLog from '../components/PipelineActivityLog'
+import ProbeDossier from '../components/ProbeDossier'
 import StatusBadge from '../components/StatusBadge'
 import TechnicalDetails from '../components/TechnicalDetails'
 import VerificationPanel from '../components/VerificationPanel'
-import type { InputMode, PipelineResponse, PipelineStep, StepStatus } from '../types'
-import { isSocialPlatform } from '../utils/socialPlatforms'
+import type { InputMode, PipelineResponse } from '../types'
 import { formatPercent } from '../utils/format'
+import { isSocialPlatform } from '../utils/socialPlatforms'
+import {
+  buildActivityLog,
+  buildPipelineSteps,
+  getStageLabel,
+  pipelineProgressPercent,
+  stageProgressDetail,
+  type ActiveStage,
+} from '../utils/pipelineHelpers'
 
 const THRESHOLD = 0.45
-type ActiveStage = 'input' | 'analyze' | 'search' | 'compare' | 'record' | 'verify' | null
-
-function stepStatus(current: ActiveStage, target: ActiveStage, failed = false): StepStatus {
-  if (failed && current === target) return 'failed'
-  if (!current) return 'not_started'
-  const order: ActiveStage[] = ['input', 'analyze', 'search', 'compare', 'record', 'verify']
-  const currentIdx = order.indexOf(current)
-  const targetIdx = order.indexOf(target)
-  if (currentIdx > targetIdx) return 'completed'
-  if (currentIdx === targetIdx) return 'processing'
-  return 'waiting'
-}
+const STAGE_SEQUENCE: Exclude<ActiveStage, null>[] = [
+  'input',
+  'analyze',
+  'search',
+  'compare',
+  'record',
+  'verify',
+]
 
 export default function HomePage() {
+  const navigate = useNavigate()
   const [inputMode, setInputMode] = useState<InputMode>('upload')
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
@@ -34,10 +43,17 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false)
   const [activeStage, setActiveStage] = useState<ActiveStage>(null)
   const [result, setResult] = useState<PipelineResponse | null>(null)
+  const [runId, setRunId] = useState<string | null>(null)
   const [error, setError] = useState<{ title: string; detail: string; technical?: string } | null>(
     null,
   )
   const [filter, setFilter] = useState<'all' | 'social'>('all')
+  const [pipelineStartedAt, setPipelineStartedAt] = useState<number | null>(null)
+  const [stageTimestamps, setStageTimestamps] = useState<
+    Partial<Record<Exclude<ActiveStage, null>, number>>
+  >({})
+  const [completedStages, setCompletedStages] = useState<ActiveStage[]>([])
+  const [, setTick] = useState(0)
 
   const hasInput = inputMode === 'upload' ? !!file : imageUrl.trim().startsWith('http')
 
@@ -58,10 +74,44 @@ export default function HomePage() {
     setDimensions(null)
     setResult(null)
     setError(null)
+    setActiveStage(null)
   }
+
+  const resetSearch = () => {
+    clearFile()
+    setImageUrl('')
+    setConsent(false)
+    setFilter('all')
+    setRunId(null)
+    setPipelineStartedAt(null)
+    setStageTimestamps({})
+    setCompletedStages([])
+  }
+
+  useEffect(() => {
+    if (!loading) return
+    const id = window.setInterval(() => setTick((t) => t + 1), 500)
+    return () => window.clearInterval(id)
+  }, [loading])
+
+  useEffect(() => {
+    if (!loading || !activeStage) return
+    const now = Date.now()
+    setStageTimestamps((prev) => (prev[activeStage] ? prev : { ...prev, [activeStage]: now }))
+    const idx = STAGE_SEQUENCE.indexOf(activeStage)
+    if (idx > 0) {
+      setCompletedStages(STAGE_SEQUENCE.slice(0, idx))
+    }
+  }, [activeStage, loading])
 
   const handleRun = async () => {
     if (!hasInput || !consent) return
+    const id = crypto.randomUUID()
+    const started = Date.now()
+    setRunId(id)
+    setPipelineStartedAt(started)
+    setStageTimestamps({ input: started })
+    setCompletedStages([])
     setLoading(true)
     setError(null)
     setResult(null)
@@ -85,6 +135,20 @@ export default function HomePage() {
       setActiveStage(res.blockchain ? 'verify' : res.search?.candidates?.length ? 'record' : 'search')
       setResult(res)
 
+      if (res.status === 'completed' && (res.search?.candidates?.length ?? 0) > 0) {
+        setTimeout(() => {
+          navigate(`/results/${res.run_id}`, {
+            state: {
+              result: res,
+              probePreview,
+              probeFileName,
+              dimensions,
+              pipelineStartedAt: started,
+            },
+          })
+        }, 1400)
+      }
+
       if (res.search?.status === 'failed') {
         setError({
           title: 'Search failed',
@@ -104,32 +168,42 @@ export default function HomePage() {
     }
   }
 
-  const pipelineSteps: PipelineStep[] = useMemo(() => {
-    const failedSearch = result?.search?.status === 'failed'
-    const failedFace = result?.status === 'failed' || error?.title === 'Face analysis failed'
+  const showDiagnostic = loading || !!result || !!error
 
-    if (!loading && !result && !error) {
-      return [
-        { id: 1, label: 'Input', status: hasInput ? 'completed' : 'not_started' },
-        { id: 2, label: 'Analyze', status: 'not_started' },
-        { id: 3, label: 'Search', status: 'not_started' },
-        { id: 4, label: 'Compare', status: 'not_started' },
-        { id: 5, label: 'Record', status: 'not_started' },
-        { id: 6, label: 'Verify', status: 'not_started' },
-      ]
-    }
+  const probeFileName =
+    file?.name ?? (imageUrl.trim() ? imageUrl.trim().replace(/^https?:\/\//, '').slice(0, 48) : 'Probe image')
+  const probePreview = preview ?? (inputMode === 'url' && imageUrl.trim() ? imageUrl.trim() : null)
+  const probeFingerprint =
+    result?.face_analysis?.input_fingerprint ?? result?.blockchain?.data_hash ?? null
 
-    return [
-      { id: 1, label: 'Input', status: stepStatus(activeStage, 'input') },
-      { id: 2, label: 'Analyze', status: failedFace ? 'failed' : stepStatus(activeStage, 'analyze') },
-      { id: 3, label: 'Search', status: failedSearch ? 'failed' : stepStatus(activeStage, 'search') },
-      { id: 4, label: 'Compare', status: stepStatus(activeStage, 'compare') },
-      { id: 5, label: 'Record', status: stepStatus(activeStage, 'record') },
-      { id: 6, label: 'Verify', status: stepStatus(activeStage, 'verify') },
-    ]
-  }, [activeStage, error, hasInput, loading, result])
+  const pipelineSteps = useMemo(
+    () =>
+      buildPipelineSteps({
+        activeStage,
+        loading,
+        hasInput,
+        result,
+        error,
+        fileName: file?.name,
+        fileSizeMb: file ? (file.size / (1024 * 1024)).toFixed(2) : undefined,
+        dimensions,
+        stageTimestamps,
+        pipelineStartedAt,
+      }),
+    [activeStage, dimensions, error, file, hasInput, loading, pipelineStartedAt, result, stageTimestamps],
+  )
 
-  const activeStepIndex = pipelineSteps.findIndex((s) => s.status === 'processing')
+  const progressPercent = pipelineProgressPercent(pipelineSteps)
+
+  const activityEntries = useMemo(
+    () => buildActivityLog(loading, activeStage, result, completedStages, stageTimestamps),
+    [activeStage, completedStages, loading, result, stageTimestamps],
+  )
+
+  const stageActivityLabel = getStageLabel(activeStage)
+  const stageDetail = stageProgressDetail(activeStage, loading, result)
+  const displayRunId = result?.run_id ?? runId
+
   const candidates = result?.search?.candidates ?? []
   const socialAvailable = candidates.some((c) => isSocialPlatform(c.source_domain))
   const filteredCandidates =
@@ -140,56 +214,99 @@ export default function HomePage() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-surface-container-low px-4 py-12 sm:px-6 lg:px-[var(--spacing-margin-screen)]">
+      <section className="relative overflow-hidden bg-surface-container-low px-4 py-8 sm:px-6 lg:px-[var(--spacing-margin-screen)] lg:py-10">
         <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-surface-container-high/60 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-32 left-1/3 h-80 w-80 rounded-full bg-secondary-container/20 blur-3xl" />
 
         <div className="relative z-10 mx-auto max-w-7xl">
-          <div className="flex items-center gap-2 font-mono-code uppercase tracking-wider text-on-surface-variant">
-            <span className="inline-flex h-2 w-2 rounded-full bg-secondary" aria-hidden="true" />
-            <span>Visual evidence pipeline</span>
-          </div>
-
-          <div className="mt-4 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
-            <div className="max-w-3xl">
-              <h1 className="text-[32px] font-semibold leading-tight tracking-tight text-on-surface lg:text-[40px]">
-                Find visual matches.
-                <br className="hidden sm:inline" />
-                Preserve the evidence.
-              </h1>
-              <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-on-surface-variant">
-                Search publicly indexed visual content, compare accessible candidates, and create a
-                tamper-evident verification record.
-              </p>
-            </div>
-
-            {result?.blockchain?.data_hash && (
-              <div className="flex items-center gap-2 self-start rounded-xl bg-surface-container-lowest px-4 py-3 shadow-sm lg:self-end">
-                <div className="flex flex-col">
-                  <span className="section-label">Latest fingerprint</span>
-                  <span className="font-mono-code font-semibold text-on-surface">
-                    {result.blockchain.data_hash.slice(0, 8)}…{result.blockchain.data_hash.slice(-4)}
+          {loading ? (
+            <>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-container-highest px-2.5 py-1 font-mono-code text-[11px] text-on-surface-variant">
+                  <span className="h-2 w-2 animate-ping rounded-full bg-secondary" />
+                  PIPELINE ACTIVE
+                </span>
+                {displayRunId && (
+                  <span className="font-mono-code text-[11px] text-on-surface-variant">
+                    RUN: #{displayRunId.slice(0, 8).toUpperCase()}
                   </span>
-                </div>
-                <MaterialIcon name="verified_user" className="text-secondary" filled size={20} />
+                )}
+                <span className="font-mono-code text-outline">•</span>
+                <span className="font-mono-code text-[11px] text-on-surface-variant">
+                  STAGE {String(Math.min(STAGE_SEQUENCE.indexOf(activeStage ?? 'input') + 1, 6)).padStart(2, '0')}/06
+                </span>
               </div>
-            )}
-          </div>
+
+              <div className="mt-4 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+                <div className="max-w-3xl">
+                  <div className="flex items-end gap-3">
+                    <span className="text-[40px] font-bold leading-none text-on-surface">{progressPercent}%</span>
+                  </div>
+                  <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-on-surface-variant">
+                    Automated perceptual embedding correlation with tamper-evident cryptographic
+                    provenance logging across verified public records.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 self-start rounded-xl bg-surface-container-lowest px-4 py-3 shadow-sm lg:self-end">
+                  <MaterialIcon name="progress_activity" className="animate-spin text-primary" size={20} />
+                  <span className="font-mono-code text-on-surface-variant">Processing authorized input…</span>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex flex-wrap items-center gap-2 font-mono-code uppercase tracking-wider text-on-surface-variant">
+                <span className="inline-flex h-2 w-2 rounded-full bg-secondary" aria-hidden="true" />
+                <span>{showDiagnostic ? 'Pipeline session' : 'Visual evidence pipeline'}</span>
+                {displayRunId && showDiagnostic && (
+                  <>
+                    <span className="text-outline">•</span>
+                    <span>RUN: #{displayRunId.slice(0, 8).toUpperCase()}</span>
+                  </>
+                )}
+              </div>
+
+              <div className="mt-4 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+                <div className="max-w-3xl">
+                  <h1 className="text-[32px] font-semibold leading-tight tracking-tight text-on-surface lg:text-[40px]">
+                    Find visual matches.
+                    <br className="hidden sm:inline" />
+                    Preserve the evidence.
+                  </h1>
+                  <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-on-surface-variant">
+                    Search publicly indexed visual content, compare accessible candidates, and create a
+                    tamper-evident verification record.
+                  </p>
+                </div>
+
+                {showDiagnostic && !loading && (
+                  <button type="button" onClick={resetSearch} className="btn-secondary self-start lg:self-end">
+                    <MaterialIcon name="add" size={18} />
+                    New search
+                  </button>
+                )}
+
+                {result?.blockchain?.data_hash && (
+                  <div className="flex items-center gap-2 self-start rounded-xl bg-surface-container-lowest px-4 py-3 shadow-sm lg:self-end">
+                    <div className="flex flex-col">
+                      <span className="section-label">Latest fingerprint</span>
+                      <span className="font-mono-code font-semibold text-on-surface">
+                        {result.blockchain.data_hash.slice(0, 8)}…{result.blockchain.data_hash.slice(-4)}
+                      </span>
+                    </div>
+                    <MaterialIcon name="verified_user" className="text-secondary" filled size={20} />
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </section>
 
       {/* Main workspace */}
       <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-[var(--spacing-margin-screen)]">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-          <div className="lg:col-span-4">
-            <PipelineSteps
-              steps={pipelineSteps}
-              activeStep={activeStepIndex >= 0 ? activeStepIndex : undefined}
-            />
-          </div>
-
-          <div className="flex flex-col gap-6 lg:col-span-8">
-            {/* Input card */}
+        {!showDiagnostic ? (
+          <div className="mx-auto flex max-w-3xl flex-col gap-6">
             <div className="card flex flex-col gap-6 p-6 lg:p-8">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex rounded-lg bg-surface-container-low p-0.5">
@@ -265,16 +382,10 @@ export default function HomePage() {
                     <div className="flex items-center justify-between rounded-lg bg-surface-container-low p-4">
                       <div className="flex items-center gap-4">
                         <div className="h-12 w-12 overflow-hidden rounded-lg bg-surface-container-highest">
-                          <img
-                            src={preview}
-                            alt="Upload preview"
-                            className="h-full w-full object-cover"
-                          />
+                          <img src={preview} alt="Upload preview" className="h-full w-full object-cover" />
                         </div>
                         <div>
-                          <p className="max-w-xs truncate text-[15px] font-semibold text-on-surface">
-                            {file?.name}
-                          </p>
+                          <p className="max-w-xs truncate text-[15px] font-semibold text-on-surface">{file?.name}</p>
                           <p className="font-mono-code text-on-surface-variant">
                             {file && `${(file.size / (1024 * 1024)).toFixed(2)} MB`}
                             {dimensions ? ` · ${dimensions.w}×${dimensions.h}px` : ''}
@@ -323,12 +434,9 @@ export default function HomePage() {
                   <MaterialIcon name="shield" size={20} />
                 </div>
                 <div>
-                  <span className="section-label font-semibold text-on-surface">
-                    Authorized usage guideline
-                  </span>
+                  <span className="section-label font-semibold text-on-surface">Authorized usage guideline</span>
                   <p className="mt-1 text-[13px] leading-relaxed text-on-surface-variant">
-                    Use only images you own, have permission to process, or are otherwise authorized
-                    to review.
+                    Use only images you own, have permission to process, or are otherwise authorized to review.
                   </p>
                 </div>
               </div>
@@ -355,13 +463,12 @@ export default function HomePage() {
                   onClick={handleRun}
                   className="btn-primary"
                 >
-                  {loading ? 'Running search…' : 'Start search'}
+                  Start search
                   <MaterialIcon name="arrow_forward" size={20} />
                 </button>
               </div>
             </div>
 
-            {/* Real capability cards — not fake marketing */}
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <div className="card flex flex-col gap-1 p-4">
                 <div className="flex items-center justify-between text-on-surface-variant">
@@ -369,9 +476,7 @@ export default function HomePage() {
                   <MaterialIcon name="face" size={16} />
                 </div>
                 <span className="text-lg font-semibold text-on-surface">YuNet + SFace</span>
-                <p className="text-[12px] text-on-surface-variant">
-                  OpenCV face detection and embedding generation on the backend.
-                </p>
+                <p className="text-[12px] text-on-surface-variant">OpenCV face detection and embedding generation.</p>
               </div>
               <div className="card flex flex-col gap-1 p-4">
                 <div className="flex items-center justify-between text-on-surface-variant">
@@ -379,9 +484,7 @@ export default function HomePage() {
                   <MaterialIcon name="travel_explore" size={16} />
                 </div>
                 <span className="text-lg font-semibold text-on-surface">SerpApi Lens</span>
-                <p className="text-[12px] text-on-surface-variant">
-                  Genuine reverse-image search against publicly indexed visual content.
-                </p>
+                <p className="text-[12px] text-on-surface-variant">Reverse-image search against publicly indexed content.</p>
               </div>
               <div className="card flex flex-col gap-1 p-4">
                 <div className="flex items-center justify-between text-on-surface-variant">
@@ -389,28 +492,67 @@ export default function HomePage() {
                   <MaterialIcon name="fingerprint" size={16} />
                 </div>
                 <span className="text-lg font-semibold text-on-surface">Local ledger</span>
-                <p className="text-[12px] text-on-surface-variant">
-                  SHA-256 fingerprints stored in a local tamper-evident blockchain.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4 rounded-xl bg-surface-container-low p-5">
-              <MaterialIcon name="info" className="mt-0.5 shrink-0 text-on-surface-variant" size={24} />
-              <div>
-                <span className="section-label font-semibold text-on-surface">
-                  Evidentiary disclaimer
-                </span>
-                <p className="mt-1 text-[13px] leading-relaxed text-on-surface-variant">
-                  Visual similarity is{' '}
-                  <strong className="font-semibold text-on-surface">not identity proof</strong>.
-                  FaceTrace calculates visual similarity for investigative reference only. All
-                  candidate matches require independent corroboration.
-                </p>
+                <p className="text-[12px] text-on-surface-variant">SHA-256 fingerprints in a tamper-evident blockchain.</p>
               </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
+            <div className="lg:col-span-4 lg:sticky lg:top-24">
+              <ForensicStepper
+                steps={pipelineSteps}
+                runId={displayRunId}
+                inputFingerprint={probeFingerprint}
+                modelUsed={result?.face_analysis?.model_used ?? (loading ? 'YuNet + SFace' : null)}
+                loading={loading}
+              />
+            </div>
+
+            <div className="flex flex-col gap-6 lg:col-span-8">
+              <div className="flex items-start gap-4 rounded-xl bg-surface-container-high p-5 shadow-sm">
+                <MaterialIcon name="info" className="mt-0.5 shrink-0 text-tertiary-container" size={24} />
+                <div>
+                  <span className="section-label font-bold tracking-wider text-on-tertiary-fixed">
+                    Investigative protocol mandate
+                  </span>
+                  <p className="mt-1 text-[13px] leading-relaxed text-on-surface">
+                    <strong>NOTICE:</strong> Visual similarity is an automated metric and does{' '}
+                    <em>not</em> constitute legal identity proof. Matches represent statistical image
+                    proximities requiring independent human verification prior to evidentiary chain entry.
+                  </p>
+                </div>
+              </div>
+
+              <ProbeDossier
+                previewUrl={probePreview}
+                fileName={probeFileName}
+                fingerprint={probeFingerprint}
+                dimensions={dimensions}
+                fileSizeMb={file ? (file.size / (1024 * 1024)).toFixed(2) : null}
+                modelUsed={result?.face_analysis?.model_used}
+                faceDetected={result?.face_analysis?.face_detected ?? false}
+                loading={loading}
+                consent={consent}
+                isUrl={inputMode === 'url'}
+              />
+
+              <PipelineActivityLog
+                entries={activityEntries}
+                loading={loading}
+                stageLabel={stageActivityLabel}
+                progressPercent={progressPercent}
+                stageDetail={stageDetail}
+              />
+
+              <CandidateStreamPreview
+                candidates={candidates}
+                bestMatchUrl={best?.source_url}
+                loading={loading && (activeStage === 'compare' || activeStage === 'search')}
+                threshold={result?.threshold ?? THRESHOLD}
+              />
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Error */}
@@ -442,9 +584,29 @@ export default function HomePage() {
                 <span className="section-label">Evidence summary</span>
                 <h2 className="mt-1 text-xl font-semibold text-on-surface">Search complete</h2>
               </div>
-              <StatusBadge tone={result.status === 'completed' ? 'success' : 'neutral'}>
-                {result.status}
-              </StatusBadge>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigate(`/results/${result.run_id}`, {
+                      state: {
+                        result,
+                        probePreview,
+                        probeFileName,
+                        dimensions,
+                        pipelineStartedAt,
+                      },
+                    })
+                  }
+                  className="btn-primary py-1.5 px-3 text-[13px]"
+                >
+                  <MaterialIcon name="verified" size={16} />
+                  View Audit Docket
+                </button>
+                <StatusBadge tone={result.status === 'completed' ? 'success' : 'neutral'}>
+                  {result.status}
+                </StatusBadge>
+              </div>
             </div>
 
             <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

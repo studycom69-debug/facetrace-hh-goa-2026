@@ -150,6 +150,9 @@ export interface PipelineStep {
   id: number
   label: string
   status: StepStatus
+  detail?: string
+  statusNote?: string
+  elapsedNote?: string
 }
 
 export type InputMode = 'upload' | 'url'

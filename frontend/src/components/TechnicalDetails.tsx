@@ -6,6 +6,7 @@ import StatusBadge from './StatusBadge'
 
 interface TechnicalDetailsProps {
   diagnostics: PipelineDiagnostics | null
+  variant?: 'default' | 'results'
 }
 
 function domainFromUrl(url: string): string {
@@ -30,7 +31,7 @@ function readableDetails(details?: Record<string, unknown>): string | null {
   return parts.length > 0 ? parts.join(' · ') : null
 }
 
-export default function TechnicalDetails({ diagnostics }: TechnicalDetailsProps) {
+export default function TechnicalDetails({ diagnostics, variant = 'default' }: TechnicalDetailsProps) {
   const [open, setOpen] = useState(false)
   if (!diagnostics) return null
 
@@ -61,6 +62,8 @@ export default function TechnicalDetails({ diagnostics }: TechnicalDetailsProps)
           : item.message,
   }))
 
+  const allPassed = stages.every((s) => s.data?.success !== false)
+
   return (
     <section className="card overflow-hidden">
       <button
@@ -69,13 +72,30 @@ export default function TechnicalDetails({ diagnostics }: TechnicalDetailsProps)
         className="flex w-full items-center justify-between gap-4 px-6 py-4 text-left transition-colors hover:bg-surface-container-low"
         aria-expanded={open}
       >
-        <div>
-          <p className="text-[13px] font-medium text-on-surface">View technical evidence</p>
-          <p className="mt-0.5 text-[12px] text-on-surface-variant">
-            Pipeline diagnostics for reviewers and judges
-          </p>
+        <div className="flex items-center gap-4">
+          {variant === 'results' && (
+            <MaterialIcon name="terminal" className="text-primary" size={20} />
+          )}
+          <div>
+            <p className={`${variant === 'results' ? 'text-lg font-semibold' : 'text-[13px] font-medium'} text-on-surface`}>
+              View technical evidence
+            </p>
+            <p className="mt-0.5 text-[12px] text-on-surface-variant">
+              Pipeline diagnostics, candidate log, and stage telemetry for reviewers
+            </p>
+          </div>
         </div>
-        <MaterialIcon name={open ? 'expand_less' : 'expand_more'} className="text-on-surface-variant" />
+        <div className="flex items-center gap-2">
+          {variant === 'results' && allPassed && (
+            <span className="rounded bg-secondary-container/40 px-2 py-0.5 font-mono-code text-[11px] text-secondary">
+              All stages passed
+            </span>
+          )}
+          <MaterialIcon
+            name={open ? 'expand_less' : 'expand_more'}
+            className={`text-on-surface-variant ${open ? 'rotate-180' : ''} transition-transform`}
+          />
+        </div>
       </button>
 
       {open && (

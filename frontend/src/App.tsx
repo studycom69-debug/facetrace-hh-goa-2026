@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
+import AuditDocketPage from './pages/AuditDocketPage'
 import HistoryDetailPage from './pages/HistoryDetailPage'
 import HistoryPage from './pages/HistoryPage'
 import HomePage from './pages/HomePage'
@@ -14,6 +15,10 @@ export default function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/results" element={<AuditDocketPage />} />
+          <Route path="/results/:runId" element={<AuditDocketPage />} />
+          <Route path="/audit-docket" element={<AuditDocketPage />} />
+          <Route path="/docket" element={<AuditDocketPage />} />
           <Route path="/history" element={<HistoryPage />} />
           <Route path="/history/:runId" element={<HistoryDetailPage />} />
           <Route path="/records" element={<RecordsPage />} />
