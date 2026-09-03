@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Environment
+.env
+
+# Data
+backend/data/uploads/*
+!backend/data/uploads/.gitkeep
+backend/data/facetrace.db
+backend/data/blockchain.json
+backend/data/models/*.onnx
+backend/data/blank.jpg
+backend/data/obama_test.jpg
+
+# Node
+node_modules/
+frontend/dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
